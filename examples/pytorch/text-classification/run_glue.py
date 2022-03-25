@@ -364,6 +364,7 @@ def main():
 
     # decompose
     if training_args.decompose:
+        training_args.output_dir = f'{training_args.output_dir}_decompose'
         print('decomposing and freezing model')
         decompose(model, 0.25)
         freeze(model)
