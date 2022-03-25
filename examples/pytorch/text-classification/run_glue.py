@@ -363,10 +363,9 @@ def main():
 
 
     # decompose
-    if training_args.decompose:
-        print('decomposing and freezing model')
-        decompose(model, 0.25)
-        freeze(model)
+    print('decomposing and freezing model')
+    decompose(model, 0.25)
+    freeze(model)
 
 
     # Preprocessing the raw_datasets
