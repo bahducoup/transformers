@@ -365,7 +365,7 @@ def main():
     # decompose
     print('decomposing and freezing model')
     decompose(model, 0.25)
-    model.freeze()
+    freeze(model)
 
 
     # Preprocessing the raw_datasets
