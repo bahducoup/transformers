@@ -364,7 +364,7 @@ def main():
 
     # decompose
     print('decomposing and freezing model')
-    model = decompose(model, 0.25)
+    decompose(model, 0.25)
     model.freeze()
 
 
