@@ -24,6 +24,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 import datasets
+from lr_linear import factorize, LinearLR
 import numpy as np
 from datasets import load_dataset, load_metric
 
@@ -44,6 +45,30 @@ from transformers import (
 from transformers.trainer_utils import get_last_checkpoint
 from transformers.utils import check_min_version
 from transformers.utils.versions import require_version
+
+
+def decompose(model, rank_ratio):
+  for layer in model.bert.encoder.layer:
+    attention = layer.attention.self
+    attention.query = factorize(attention.query, rank_ratio)
+    attention.key = factorize(attention.key, rank_ratio)
+    attention.value = factorize(attention.value, rank_ratio)
+
+
+def freeze(model):
+  for layer in model.bert.encoder.layer:
+    attention = layer.attention.self
+    for k, v in attention.named_modules():
+      if isinstance(v, LinearLR):
+        v.freeze()
+
+
+def unfreeze(model):
+  for layer in model.bert.encoder.layer:
+    attention = layer.attention.self
+    for k, v in attention.named_modules():
+      if isinstance(v, LinearLR):
+        v.unfreeze()
 
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
@@ -335,6 +360,13 @@ def main():
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
     )
+
+
+    # decompose
+    print('decomposing and freezing model')
+    model = decompose(model, 0.25)
+    model.freeze()
+
 
     # Preprocessing the raw_datasets
     if data_args.task_name is not None:
