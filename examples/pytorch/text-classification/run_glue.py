@@ -16,6 +16,8 @@
 """ Finetuning the library models for sequence classification on GLUE."""
 # You can also adapt this script on your own text classification task. Pointers for this are left as comments.
 
+DECOMPOSE = True
+
 import logging
 import os
 import random
@@ -363,9 +365,10 @@ def main():
 
 
     # decompose
-    print('decomposing and freezing model')
-    decompose(model, 0.25)
-    freeze(model)
+    if DECOMPOSE:
+        print('\n\n\n>>>>>>>>>> decomposing and freezing model <<<<<<<<<<<\n\n\n')
+        decompose(model, 0.25)
+        freeze(model)
 
 
     # Preprocessing the raw_datasets
